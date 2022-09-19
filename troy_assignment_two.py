@@ -23,13 +23,18 @@ Summary Statistics from get_statistics() function
     Minimum is:  -0.2420491
     Maximum is:  0.15555312
     Mean is:  1.8423238e-05
+    Standard Deviation: 0.013517889
     Median is:  2.5055645e-06
     5th percentile is:  -0.01867481768131256
     95th percentile is:  0.018806135002523663
     NaN count is:  104008424
     Total value-carrying pixels:  47248664
     
+    RMS is: -0.002928715
+    
 Histogram of the data of value-carrying pixels is included in the files of this assignment
+
+Plots of slice 293 with varying rms is included in the files of this assignment
         
 """
 from astropy.io import fits
@@ -51,11 +56,54 @@ image_data = fits.getdata(image_file, ext=0)
 hdr = fits.PrimaryHDU().header
 
 #This code shows a slice of a user defined layer
-def show_slice(i):
+def show_slice(i, noise):
     photo_data = image_data[0][i]
     plt.figure()
-    plt.imshow(photo_data, cmap='gray')
+    plt.imshow(photo_data, cmap='nipy_spectral', vmin = noise)
     plt.colorbar()
+    
+#defining stdev for easier access in terminal
+stdev = 0.013517889
+"""Getting a good rms"""
+def get_rms():
+    data_array = []
+    layer = image_data[0][293]
+    for x in range(190,210):
+        for y in range(200,230):
+            data_array.append(layer[x][y])
+    data = np.array(data_array)
+    return(np.mean(data))
+
+"""RMS is -0.002928715"""
+rms = -0.002928715
+
+def get_stdev(num):
+    """This funciton returns the standard deviation of a given layer"""
+    data_list = []
+    layer = image_data[0][num]
+    for x in range(layer.shape[0]):
+        for y in range(layer.shape[1]):
+            #slicing individual pixels in layer
+            pixel = layer[x][y]
+            if not(math.isnan(pixel)):
+                data_list.append(pixel)
+    data = np.array(data_list)
+    return(np.std(data))
+
+def get_hist(num):
+    """Plots a histogram of a given layer"""
+    data_list = []
+    layer = image_data[0][num]
+    for x in range(layer.shape[0]):
+        for y in range(layer.shape[1]):
+            #slicing individual pixels in layer
+            pixel = layer[x][y]
+            if not(math.isnan(pixel)):
+                data_list.append(pixel)
+    data = np.array(data_list, dtype=object)
+    plt.hist(data)
+    plt.show()
+
 
 def get_statistics():
     nan_counter = 0
@@ -83,6 +131,7 @@ def get_statistics():
     print("Median is: ", np.median(data))
     print("5th percentile is: ", np.percentile(data, 5))
     print("95th percentile is: ", np.percentile(data, 95))
+    print("Standard Deviation is: ", np.std(data))
     print("NaN count is: ", nan_counter)
     print("Total value-carrying pixels: ", volume - nan_counter)
     #plotting histogram
@@ -90,22 +139,6 @@ def get_statistics():
     plt.hist(data, 50)
     plt.show()
     
-        
-    
-evt_data = Table(hdul[0].data)[0]
-""" this is a table with 576 columns. Each column represents a 2D slice of 
-the data with size (512, 512)"""
-#print(evt_data)
-
-"""Getting histograms"""
-def hist(layer):
-    """ INCURS THE FOLLOWING ERROR:
-    ValueError: setting an array element with a sequence
-    """
-    hist = plt.hist(evt_data[layer])
-    plt.plot(hist)
-    plt.savefig()
-    plt.show()
 
 def get_info():
     hdu = fits.PrimaryHDU()
