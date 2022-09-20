@@ -5,7 +5,7 @@ import numpy as np
 import astropy 
 from astropy.io import fits as fs
 
-myfile = fs.open('cleanimage.G10.99.SiO.12m.7m.combined.image.mom0.fits')
+myfile = fs.open('DATA/autoG28.23_SiO.12m.tc_final.fits')
 
 print(myfile[0].header)
 print(type(myfile[0].data))
