@@ -100,22 +100,7 @@ plt.show()
 
 
 
-plt(image_data, gg = True)
 
-
-# passing various options to matplot
-plt(image_data, lty = 1:5, col = 'blue', xlab = 'foo', ylab = 'bar', ylim = c(0.4,0.6), main = 'my plot')
-
-# Using colour ramps
-plt(image_data, lty = 1, cmap = 'rainbow', main = "It is possible to create really ugly visualisations")
-
-## Not run: 
-# Example using colours given by ColorBrewer (http://colorbrewer2.org/)
-plt(image_data, lty = 1)
-plt.show()
-## End(Not run)
-
-# Using an attribute to group spectra
 
 
 
