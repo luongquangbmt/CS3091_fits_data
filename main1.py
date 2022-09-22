@@ -1,5 +1,3 @@
-# CS3091_fits_data
-
 from astropy.io import fits
 import numpy as np
 
@@ -63,7 +61,6 @@ mean=1.4208172e-05
 median=-1.6927841e-05
 
 '''
-
 
 
 
