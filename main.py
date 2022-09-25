@@ -1,6 +1,9 @@
 from astropy.io import fits
-hdul = fits.open('DATA/cleanimage1.fits')
+hdul = fits.open('cleanimage1.fits')
 import sys
-## hello see if this works
+
+
+print(hdul[0].header)
+print(hdul[0].data)
 
 print(sys.path)
