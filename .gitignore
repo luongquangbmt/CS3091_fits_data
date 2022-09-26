@@ -1,5 +1,10 @@
 RAW_DATA/
 AUX_DATA/
+PROCESSED_DATA/
+DATA/
+
+.idea/
+.DS_Store
 
 
 
@@ -132,4 +137,3 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-
