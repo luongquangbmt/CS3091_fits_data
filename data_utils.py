@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 import pprint
 import numpy as np
 from astropy.io import fits
@@ -33,6 +30,7 @@ class DataUtils:
     def stats(self):
         # Get statistics of data
         x = {
+            "size": self.fits_data.size,
             "shape": self.fits_data.shape,
             "min": np.min(self.fits_data),
             "max": np.max(self.fits_data),
