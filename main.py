@@ -24,7 +24,7 @@ from astropy.io.fits import getdata
 #plt.style.use(astropy_mpl_style)
 
 
-hdul_list = fits.open('DATA\cleanimage.G10.99_Feather_SiO.image.fits') 
+hdul_list = fits.open('DATA\G1099SiO12m7mtpcombined.fits') 
 hdul_list.info()
 image_data = hdul_list[0].data
 print(image_data.shape)
@@ -83,7 +83,7 @@ plt.show()
 '''
 #Dendrogram
 Dendrogram
-d = Dendrogram.compute(image_data[0],  min_value='min', min_npix=10, min_delta=2.0)
+d = Dendrogram.compute(image_data[0],   min_value='min', min_npix=20, min_delta=0.1)
 p = d.plotter()
 v=d.viewer()
 v.show()
