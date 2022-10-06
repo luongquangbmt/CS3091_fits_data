@@ -1,53 +1,121 @@
-import pprint
-import numpy as np
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Oct  3 13:31:42 2022
+
+@author: troyobernolte
+
+Purpose: utilities functions
+"""
+
 from astropy.io import fits
-from datetime import datetime
+from data_inspection import get_info
+import matplotlib.pyplot as plt
+from astrodendro import Dendrogram
+from astrodendro.analysis import PPStatistic
 
-from matplotlib import pyplot as plt
+#Importing image data
+image_file = 'data/cleanimage.G10.99.SiO.12m.7m.combined.image.mom0.fits'
+#Access image data. The 1st two dimensions aren't important, we only use the 3rd and 4th
+image_data = fits.getdata(image_file, ext=0)[0][0]
 
+d = Dendrogram.load_from('dendrogram_clean_image.fits')
 
-class DataUtils:
-    pass
+trunk = d.trunk
 
-    def __init__(self, fits_fn):
-        # print("Initialize the class")
-        myfile = fits.open(fits_fn)
-        # print(myfile[0].header)
-        self.fits_hdr = myfile[0].header
-        self.fits_data = myfile[0].data
-        # print(np.shape(self.fits_data))
+p = d.plotter()
 
-    def squeeze_fits(self, out_folder='./', out_datetime=False, out_name='squeezed_fits'):
-        my_squeezed_image = self.fits_data.squeeze()
-        hdr = self.fits_hdr
-        print(np.shape(my_squeezed_image))
-        _out_datetime = f"_{str(datetime.now())}" if out_datetime else ""
-        outfile = f"{out_folder}/{out_name}{_out_datetime}.fits"
-        fits.writeto(outfile, my_squeezed_image, hdr, overwrite=True)
-        self.squeezed_fit = my_squeezed_image
+def highlight(struct_num):
+    #shows the dendrogram and highlights a structure. Structure 8&1 is very cool
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
 
-    # returns stats of data & prints it
-    def stats(self):
-        # Get statistics of data
-        x = {
-            "size": self.fits_data.size,
-            "shape": self.fits_data.shape,
-            "min": np.min(self.fits_data),
-            "max": np.max(self.fits_data),
-            "mean": np.mean(self.fits_data),
-            "median": np.median(self.fits_data),
-            "percentile_5": np.percentile(self.fits_data, 5),
-            "percentile_95": np.percentile(self.fits_data, 95),
-            "std": np.std(self.fits_data),
-            "NaN_count": np.count_nonzero(np.isnan(self.fits_data))
-        }
+    # Show contour for ``min_value``
+    ax.set_xlabel(("Structure {} is highlighted").format(struct_num))
+    ax.set_ylabel("Flux")
 
-        pprint.pprint(x)  # pretty print dict
-        return x
+    # Highlight two branches
+    p.plot_tree(ax, color='black', lw=2, alpha=0.5)
 
-    def draw_image(self, cmap='gist_ncar'):
-        plt.figure()
-        data_std = np.std(self.squeezed_fit[0, 100:150, 200:221])
-        plt.imshow(self.squeezed_fit[0], vmin=2 * data_std, cmap=cmap)
-        plt.colorbar()
-        plt.show()
+    p.plot_tree(ax, structure=[struct_num], color='red', lw=2, alpha=0.5)
+    plt.show()
+    
+def contour(struct):
+    """Takes in a structure number and shows the contour of that strucure"""
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    ax.imshow(image_data, origin='lower', interpolation='nearest', cmap=plt.cm.Blues, vmax=4.0)
+
+    # Show contour for ``min_value``
+    p.plot_contour(ax, color='black')
+
+    # Highlight given branches
+    p.plot_contour(ax, structure=struct, lw=3, colors='red')
+    
+def contour_leaves():
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    ax.imshow(image_data, origin='lower', interpolation='nearest', cmap=plt.cm.Blues, vmax=4.0)
+    p.plot_contour(ax, color='black')
+    for leaf in d.leaves:
+        p.plot_contour(ax, structure=leaf, colors='red')
+        s = PPStatistic(leaf)
+        ellipse = s.to_mpl_ellipse(edgecolor='orange', facecolor='none')
+        ax.add_patch(ellipse)
+        
+    
+
+def max_pixel():
+    max_value = 0
+    peak = None
+    for element in trunk:
+        local_peak = element.get_peak()
+        if local_peak[1] > max_value:
+            max_value = local_peak[1]
+            peak = local_peak
+    return peak
+
+def show_dendrogram():
+    d.viewer()
+    
+
+def show_peak():
+    plt.figure()
+    largest = max_pixel()
+    x = largest[0][0]
+    y = largest[0][1]
+    #Get the mean noise from data inspection
+    mean_noise = get_info()[1]
+    #Show the image with the mean noise as a min value
+    plt.imshow(image_data, cmap='nipy_spectral', vmin=mean_noise)
+    plt.colorbar()
+    #Plot a circle with the cordinates given by finding the max
+    circle1 = plt.Circle((x,y), 25, color = 'r', fill = False)
+    fig = plt.gcf()
+    ax = fig.gca()
+    ax.add_patch(circle1)
+    plt.title("Image with largest value circled")
+    plt.show()
+    
+def stats():
+    stat = PPStatistic(d.trunk[0])
+    major_sigma	 = stat.major_sigma	
+    print("Major sigma is: ", major_sigma)
+    minor_sigma	= stat.minor_sigma	
+    print("Minor sigma is: ", minor_sigma)
+    position_angle	 = stat.position_angle
+    print("Position angle is: ", position_angle)
+    radius = stat.radius
+    print("Radius is: ", radius)
+    area_exact = stat.area_exact
+    print("Exact area of structure on the sky is: ", area_exact)
+    area_ellipse = stat.area_ellipse
+    print("Elipse area is: ", area_ellipse)
+    x_cen = stat.x_cen	
+    print("Mean position of the structure in the x direction: ", x_cen)
+    y_cen = stat.y_cen
+    print("Mean position of the structure in the y direction: ", y_cen)
+    
+
+    
+

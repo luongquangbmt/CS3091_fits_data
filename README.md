@@ -1,29 +1,14 @@
-# CS3091_fits_data: HW 2 v1.0
-##### Joe Tannoury
+# Dendrogram clustering
 
-### Change List
+This program clusters an image file into a dendrogram using the Astropy module
 
-- no more assignment_1.py, from now the file to run is main.py
-- create a new branch for every HW from now on, with an updated readme file
-- make use of data_utils.py from main.py
+Upon running main.py, plots will be produced showing the original image, 
+the image with the largest point circled, a dendrogram of the image, a dendrogram
+with a structure highlighted (you can change the structure by changing the int value),
+a contour of the structure (similarly, you can change the structure by chaning the value),
+a contour with all of the leaves, print the statistics for the data.
 
-
-
-## How to run
-
-Run main.py
-
-
-
-## Python scripts
-
-- **main.py**: runs the homework
-- **data_inspection.py**: basic script to read fits files, header, data, and plot the image
-- **data_utils.py**: utilities functions
-  - **squeeze_fits(out_folder, out_name, out_datetime)**: squeeze the fits dimensions and export new fits files
-    - _out_folder_: (optional, default current folder './')
-    - _out_name_: (optional, default 'squeezed_fits')
-    - _out_datetime_: (optional, True or False, default False) 
-  - **stats**: comprehensive stats of the fits data
-  - **draw_image(cmap)**: draw
-    - _cmap_: (optional, default 'gist_ncar')
+The goal with this unsupervised learning would be to identify certain clusters of signals.
+These clusters could be labeled, such as saying "a dendrogram with _____ characteristics 
+represents a ______ formation". This could be used to process large amounts of 
+data. Then, similar clusters could be identified and automatically labeled. 
